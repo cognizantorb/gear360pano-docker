@@ -87,10 +87,6 @@ run_command() {
   if [ $status -ne 0 ]; then
     # We failed, inform the user and clean-up
     echo "Error while running $1" >&2
-    if [ $1 != "notify-send" ]; then
-       # Display error in a nice graphical popup if available
-       run_command notify-send -a $0 "Error while running $1"
-    fi
     clean_up
     exit 1
   fi
@@ -123,7 +119,7 @@ check_preconditions() {
 
   type nona >/dev/null 2>&1 || { echo >&2 "Hugin required but it is not installed. Aborting."; exit 1; }
   type ffmpeg >/dev/null 2>&1 || { echo >&2 "ffmpeg required but it's not installed. Will abort."; error=1; }
-  type multiblend >/dev/null 2>&1 || { echo >&2 "multiblend required but it's not installed. Will abort."; error=1; }
+  #type multiblend >/dev/null 2>&1 || { echo >&2 "multiblend required but it's not installed. Will abort."; error=1; }
 
   # Use parallel? Check if we have it
   # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
@@ -142,7 +138,7 @@ check_preconditions() {
 # Check required argument(s)
 if [ -z "${1+x}" ]; then
   print_help
-  run_command notify-send -a $0 "Please provide an input file."
+  echo "Please provide an input file."
   exit 1
 fi
 
@@ -219,7 +215,6 @@ else
 fi
 
 # Extract frames from video
-run_command notify-send -a $0 "Starting panoramic video stitching..."
 echo "Extracting frames from video (this might take a while)..."
 # Note: anything in quotes will be treated as one single option
 run_command "ffmpeg" "-y" "-i" "$1" $FFMPEGQUALITYDEC "$FRAMESTEMPDIR/$IMAGETMPLDEC"
@@ -251,10 +246,10 @@ export -f run_command print_debug clean_up
 echo "Stitching frames..."
 if [ -z "${USEPARALLEL+x}" ]; then
   # No parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -m -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
+  find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
 else
   # Use parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS --bar run_command "$DIR/gear360pano.sh" -r -m -o "$OUTTEMPDIR" {} "$PTOTMPL"
+  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS --bar run_command "$DIR/gear360pano.sh" -r -o "$OUTTEMPDIR" {} "$PTOTMPL"
 fi
 
 # Put stitched frames together
@@ -283,11 +278,9 @@ print_debug "Input video has audio: ${SRCHASAUDIO}"
 
 if [ -n "$SRCHASAUDIO" ]; then
   echo "Extracting audio..."
-  run_command notify-send -a $0 "Extracting audio from source video..."
   run_command ffmpeg -y -i "$1" -vn -acodec copy "$OUTTEMPDIR/$TMPAUDIO"
 
   echo "Merging audio..."
-  run_command notify-send -a $0 "Merging audio with final video..."
   run_command ffmpeg -y -i "$OUTTEMPDIR/$TMPVIDEO" -i "$OUTTEMPDIR/$TMPAUDIO" -c:v copy -c:a aac -strict experimental "$OUTNAME"
 else
   print_debug "No audio detected (timelapse video?), continuing..."
@@ -301,5 +294,4 @@ clean_up
 ENDTS=`date +%s`
 RUNTIME=$((ENDTS-STARTTS))
 echo Video written to $OUTNAME, took: $RUNTIME s
-run_command notify-send -a $0 "'Conversion complete. Video written to $OUTNAME, took: $RUNTIME s'"
 exit 0

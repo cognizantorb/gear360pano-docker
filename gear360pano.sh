@@ -64,10 +64,6 @@ run_command() {
   local status=$?
   if [ $status -ne 0 ]; then
     echo "Error while running $1" >&2
-    if [ $1 != "notify-send" ]; then
-      # Display error in a nice graphical popup if available
-      run_command notify-send -a $SCRIPTNAME "Error while running $1"
-    fi
     clean_up
     exit 1
   fi
