@@ -119,7 +119,7 @@ check_preconditions() {
 
   type nona >/dev/null 2>&1 || { echo >&2 "Hugin required but it is not installed. Aborting."; exit 1; }
   type ffmpeg >/dev/null 2>&1 || { echo >&2 "ffmpeg required but it's not installed. Will abort."; error=1; }
-  #type multiblend >/dev/null 2>&1 || { echo >&2 "multiblend required but it's not installed. Will abort."; error=1; }
+  type multiblend >/dev/null 2>&1 || { echo >&2 "multiblend required but it's not installed. Will abort."; error=1; }
 
   # Use parallel? Check if we have it
   # https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
@@ -246,10 +246,10 @@ export -f run_command print_debug clean_up
 echo "Stitching frames..."
 if [ -z "${USEPARALLEL+x}" ]; then
   # No parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
+  find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -m -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
 else
   # Use parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS --bar run_command "$DIR/gear360pano.sh" -r -o "$OUTTEMPDIR" {} "$PTOTMPL"
+  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS --bar run_command "$DIR/gear360pano.sh" -r -m -o "$OUTTEMPDIR" {} "$PTOTMPL"
 fi
 
 # Put stitched frames together
