@@ -23,6 +23,9 @@ RUN apt-get update && apt-get install -y \
     parallel \
     ffmpeg
 
+RUN mkdir /in
+RUN mkdir /out
+
 WORKDIR /app
 COPY driver.sh gear360pano.sh gear360video.sh *.pto test/testgear360pano.sh test/testgear360video.sh .
 

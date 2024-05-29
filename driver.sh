@@ -11,8 +11,13 @@ case "$1" in
     video)
         # Shift the arguments to remove the first one
         shift
-        # Execute the gear360video.sh script with the remaining arguments
-        ./gear360video.sh "$@"
+        # Save remaining arguments
+        args=("$@")
+        # Execute the gear360video.sh script for each .mp4 file in the /in directory
+        for file in `find /in -iname "*.mp4" -type f`
+        do
+            ./gear360video.sh "$file" "${args[@]}"
+        done
         ;;
     test)
         ./testgear360pano.sh
