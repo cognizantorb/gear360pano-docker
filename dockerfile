@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     ffmpeg
 
 WORKDIR /app
-COPY gear360pano.sh gear360video.sh *.pto test/testgear360pano.sh test/testgear360video.sh .
+COPY driver.sh gear360pano.sh gear360video.sh *.pto test/testgear360pano.sh test/testgear360video.sh .
 
-ENTRYPOINT ["./testgear360video.sh"]
+ENTRYPOINT ["./driver.sh"]
+CMD []
