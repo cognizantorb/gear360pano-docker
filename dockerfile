@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN mkdir /in
 RUN mkdir /out
+RUN mkdir -p /app/html/data
 
 WORKDIR /app
 COPY driver.sh gear360pano.sh gear360video.sh *.pto test/testgear360pano.sh test/testgear360video.sh .

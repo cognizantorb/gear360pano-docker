@@ -38,7 +38,7 @@ The container must be invoked with volumes for the input and output directories 
 If the current directory has both an `input` folder with `360_0001.JPG` in it and an empty `output` folder, running
 
 ```
-docker run --rm -v "input:/in" -v "output:/app/html/data" gear360 pano
+docker run --rm -v "input:/in" -v "output:/out" gear360 pano
 ```
 
 will produce `360_0001_pano.jpg` in the output directory. One JPG file will be produced in the output directory for each one in the input directory. 
@@ -64,7 +64,7 @@ on disk space, switch to png format (change inside the script), but the processi
 If the current directory has both an `input` folder with `video.mp4` in it and an empty `output` folder, running
 
 ```
-docker run --rm -v "input:/in" -v "output:/app/html/data" gear360 video
+docker run --rm -v "input:/in" -v "output:/out" gear360 video
 ```
 
 will produce ```video_pano.mp4``` in the output directory. One MP4 file will be produced in the output directory for each one in the input directory. 
@@ -88,5 +88,5 @@ Configuring Docker to have access to the GPU is beyond the scope of this README,
 
 Once Docker has been configured, the commands above will use the GPU if you additionally pass in the `--gpus all` flag. For example, the command above for converting a video would become
 ```
-docker run --rm --gpus all -v "input:/in" -v "output:/app/html/data" gear360 video
+docker run --rm --gpus all -v "input:/in" -v "output:/out" gear360 video
 ```
