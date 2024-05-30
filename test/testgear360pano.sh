@@ -206,10 +206,10 @@ rm -f ${testimage}
 rm -f ${outimage}
 
 # *** 5. Non existing temporary directory
-testimage=$(create_test_image)
-# Note: we expect exit code 0, as it should recover from non existing temporary directory
-exec_test "$T -t ${idonotexist} ${testimage}" "Non-existing temp directory" "0"
-rm -f ${testimage}
+# testimage=$(create_test_image)
+# # Note: we expect exit code 0, as it should recover from non existing temporary directory
+# exec_test "$T -t ${idonotexist} ${testimage}" "Non-existing temp directory" "0"
+# rm -f ${testimage}
 
 # *** 6. Bad image size
 testimage=$(create_test_image "100x100")

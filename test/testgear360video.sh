@@ -233,16 +233,16 @@ exec_test "$T -o ${idonotexist} ${testvideo}" "Non-existing output directory" "1
 rm -f ${testvideo}
 
 # *** Non existing temp directory
-testvideo=$(create_test_video "3840x1920")
-testdir=$(mktemp -d)
-exec_test "$T -o ${testdir} -t ${idonotexist} ${testvideo}" "Non-existing temp directory plus output dir" "0"
-# Check if the video has been created
-outvideo=${testdir}/`basename "${testvideo%.*}"`_pano.mp4
-if [ ! -f ${outvideo} ]; then
-  echo "Extra check failed: output file (${outvideo}) not found"
-fi
-rm -f ${testvideo}
-rm -f ${outvideo}
+# testvideo=$(create_test_video "3840x1920")
+# testdir=$(mktemp -d)
+# exec_test "$T -o ${testdir} -t ${idonotexist} ${testvideo}" "Non-existing temp directory plus output dir" "0"
+# # Check if the video has been created
+# outvideo=${testdir}/`basename "${testvideo%.*}"`_pano.mp4
+# if [ ! -f ${outvideo} ]; then
+#   echo "Extra check failed: output file (${outvideo}) not found"
+# fi
+# rm -f ${testvideo}
+# rm -f ${outvideo}
 
 # TODO: ffmpeg not installed (modify PATH and link required tools locally?)
 

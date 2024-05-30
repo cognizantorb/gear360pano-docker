@@ -76,11 +76,7 @@ process_panorama() {
   print_debug "Args: $@"
 
   # Create temporary directory
-  if [ -n "$TEMPDIRPREFIX" ]; then
-    TEMPDIR=`mktemp -d -p $TEMPDIRPREFIX`
-  else
-    TEMPDIR=`mktemp -d`
-  fi
+  TEMPDIR=`mktemp -d`
 
   print_debug "process_panorama: args: in: $1, out: $2, tmpl: $3, tempdir: ${TEMPDIR}"
 
@@ -168,8 +164,6 @@ print_help() {
   echo "-n|--no-gpu  do not use GPU (safer but slower)"
   echo "-q|--quality QUALITY will set the JPEG quality to quality"
   echo "-r|--remove  remove source file after processing (use with care)"
-  echo "-t|--temp DIR set temporary directory (default: use system's"
-  echo "             temporary directory)"
   echo "-h|--help    prints this help"
 }
 
@@ -219,15 +213,6 @@ case $key in
     # Remove source file after processing
     print_debug "Will remove source file after processing"
     REMOVESOURCE=1
-    shift
-    ;;
-  -t|--temp)
-    if [ -d "$2" ]; then
-      TEMPDIRPREFIX="$2"
-    else
-      echo "Given temporary ($2) is not a directory, using system default"
-    fi
-    shift
     shift
     ;;
   *)

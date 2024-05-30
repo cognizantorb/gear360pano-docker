@@ -105,8 +105,6 @@ print_help() {
   echo -e "be stitched to dummy_pano.mp4.\n"
   echo "-p|--parallel   use GNU Parallel to speed-up processing"
   echo "-s|--speed      optimise for speed (lower quality)"
-  echo "-t|--temp DIR   set temporary directory (default: system's"
-  echo "                temporary directory)"
   echo "-h|--help       prints this help"
 }
 
@@ -167,15 +165,6 @@ case $key in
     print_debug "Use of GNU Parallel enabled"
     shift
     ;;
-  -t|--temp)
-    if [ -d "$2" ]; then
-      TEMPDIRPREFIX="$2"
-    else
-      echo "Given temporary ($2) is not a directory, using default"
-    fi
-    shift
-    shift
-    ;;
   -s|--speed)
     FFMPEGQUALITYDEC=""
     FFMPEGQUALITYENC="-c:v libx264 -preset ultrafast"
@@ -203,14 +192,8 @@ check_preconditions
 STARTTS=`date +%s`
 
 # Handle temporary directories
-if [ -n "$TEMPDIRPREFIX" ]; then
-  # On some systems not using '-p .' (temp in current dir) might cause problems
-  FRAMESTEMPDIR=`mktemp -d -p $TEMPDIRPREFIX`
-  OUTTEMPDIR=`mktemp -d -p $TEMPDIRPREFIX`
-else
-  FRAMESTEMPDIR=`mktemp -d`
-  OUTTEMPDIR=`mktemp -d`
-fi
+FRAMESTEMPDIR=`mktemp -d`
+OUTTEMPDIR=`mktemp -d`
 
 # Extract frames from video
 echo "Extracting frames from video (this might take a while)..."
