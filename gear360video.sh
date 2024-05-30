@@ -103,8 +103,6 @@ print_help() {
   echo "parameter is optional. Video file will be written"
   echo "to a file with appended _pano, ex.: dummy.mp4 will"
   echo -e "be stitched to dummy_pano.mp4.\n"
-  echo "-o|--output DIR will set the output directory of panoramas"
-  echo "                default: html/data"
   echo "-p|--parallel   use GNU Parallel to speed-up processing"
   echo "-s|--speed      optimise for speed (lower quality)"
   echo "-t|--temp DIR   set temporary directory (default: system's"
