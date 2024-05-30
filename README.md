@@ -23,22 +23,22 @@ This is based on the excellent work of [ultramango](https://github.com/ultramang
 # Installation
 
 1. Enlist this repository (or download/unzip it) onto a machine that has Docker installed. 
-2. From a console, go to the root directory. 
-3. Build the docker container: 
+2. From a console, go to the root directory of the enlistment. 
+3. Build the docker container by entering the docker build command manually or using the helper script: 
     ```
-    docker build -t gear360 .
+    ./build.sh
     ```
 
 # Usage
 
-The container must be invoked with volumes for the input and output directories mapped to `/in` and `/out` respectively, plus a command line argument of either `pano` or `video` to determine which type of processing to perform. Other command line switches for the two modes are listed below. 
+The container must be invoked with volumes for the input and output directories mapped to `/in` and `/out` respectively, plus a command line argument of either `pano` or `video` to determine which type of processing to perform. Other command line switches for the two modes are listed below. The small helper script `run.sh` can help with the syntax, but it's just a single command to invoke manually. 
 
 ## Photos
 
-If the current directory has both an `input` folder with `360_0001.JPG` in it and an empty `output` folder, running
+If there's an `~/input360` folder with `360_0001.JPG` in it and an empty `~/output360` folder, running
 
 ```
-docker run --rm -v "input:/in" -v "output:/out" gear360 pano
+./run.sh ~/input360 ~/output360 pano
 ```
 
 will produce `360_0001_pano.jpg` in the output directory. One JPG file will be produced in the output directory for each one in the input directory. 
@@ -61,10 +61,10 @@ on disk space, switch to png format (change inside the script), but the processi
 
 ## Videos
 
-If the current directory has both an `input` folder with `video.mp4` in it and an empty `output` folder, running
+If there's an `~/input360` folder with `video.mp4` in it and an empty `~/output360` folder, running
 
 ```
-docker run --rm -v "input:/in" -v "output:/out" gear360 video
+./run.sh ~/input360 ~/output360 video
 ```
 
 will produce ```video_pano.mp4``` in the output directory. One MP4 file will be produced in the output directory for each one in the input directory. 
@@ -88,5 +88,5 @@ Configuring Docker to have access to the GPU is beyond the scope of this README,
 
 Once Docker has been configured, the commands above will use the GPU if you additionally pass in the `--gpus all` flag. For example, the command above for converting a video would become
 ```
-docker run --rm --gpus all -v "input:/in" -v "output:/out" gear360 video
+docker run --rm --gpus all -v "~/input360:/in" -v "~/output360:/out" gear360 video
 ```
