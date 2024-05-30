@@ -249,7 +249,7 @@ if [ -z "${USEPARALLEL+x}" ]; then
   find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -m -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
 else
   # Use parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS --bar run_command "$DIR/gear360pano.sh" -r -m -o "$OUTTEMPDIR" {} "$PTOTMPL"
+  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS run_command "$DIR/gear360pano.sh" -r -m -o "$OUTTEMPDIR" {} "$PTOTMPL"
 fi
 
 # Put stitched frames together

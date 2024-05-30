@@ -84,7 +84,7 @@ files
 
 The [Usage section](#usage) describes the easiest way to use the container: enlist, build, run. However, because Docker by default does not have access to the GPU, this will cause all processing to fall back to the CPU. If you need to convert images and videos infrequently and/or you have a lot of time to let it run in the background, this may be sufficient, especially with modern processors. However, if you need the additional speed that the GPU can provide, it's possible to grant Docker access to the GPU. 
 
-Configuring Docker to have access to the GPU is beyond the scope of this README, but there are several guides online, including configuring [WSL 2](https://learn.microsoft.com/en-us/windows/ai/directml/gpu-cuda-in-wsl) to allow Docker to use the GPU. This typically just requires the installation of a new driver. 
+Configuring Docker to have access to the GPU is beyond the scope of this README, but there are [several](https://www.howtogeek.com/devops/how-to-use-an-nvidia-gpu-with-docker-containers/) guides online, including configuring [WSL 2](https://learn.microsoft.com/en-us/windows/ai/directml/gpu-cuda-in-wsl) to allow Linux (and thus Docker) to use the GPU. This typically requires the installation of a new driver and some extra configuration on the host machine. 
 
 Once Docker has been configured, the commands above will use the GPU if you additionally pass in the `--gpus all` flag. For example, the command above for converting a video would become
 ```

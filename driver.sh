@@ -1,22 +1,26 @@
 #!/bin/bash
 
+mode=$1
+# Shift the arguments to remove the first one
+shift
+# Save remaining arguments
+args=("$@")
+
 # Check the first argument
-case "$1" in
+case "$mode" in
     pano)
-        # Shift the arguments to remove the first one
-        shift
-        # Execute the gear360pano.sh script with the remaining arguments
-        ./gear360pano.sh "$@"
+        # Execute the gear360pano.sh script for each file in the /in directory, in parallel
+        # find /in -iname '*.jpg' -type f | parallel --load 99% --noswap --memfree 500M ./gear360pano.sh "${args[@]}" {}
+        for file in `find /in -iname "*.jpg" -type f`
+        do
+            ./gear360pano.sh "${args[@]}" "$file"
+        done
         ;;
     video)
-        # Shift the arguments to remove the first one
-        shift
-        # Save remaining arguments
-        args=("$@")
         # Execute the gear360video.sh script for each .mp4 file in the /in directory
         for file in `find /in -iname "*.mp4" -type f`
         do
-            ./gear360video.sh "$file" "${args[@]}"
+            ./gear360video.sh "${args[@]}" "$file"
         done
         ;;
     test)
