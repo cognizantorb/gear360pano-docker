@@ -87,10 +87,6 @@ run_command() {
   if [ $status -ne 0 ]; then
     # We failed, inform the user and clean-up
     echo "Error while running $1" >&2
-    if [ $1 != "notify-send" ]; then
-       # Display error in a nice graphical popup if available
-       run_command notify-send -a $0 "Error while running $1"
-    fi
     clean_up
     exit 1
   fi
@@ -107,12 +103,7 @@ print_help() {
   echo "parameter is optional. Video file will be written"
   echo "to a file with appended _pano, ex.: dummy.mp4 will"
   echo -e "be stitched to dummy_pano.mp4.\n"
-  echo "-o|--output DIR will set the output directory of panoramas"
-  echo "                default: html/data"
-  echo "-p|--parallel   use GNU Parallel to speed-up processing"
   echo "-s|--speed      optimise for speed (lower quality)"
-  echo "-t|--temp DIR   set temporary directory (default: system's"
-  echo "                temporary directory)"
   echo "-h|--help       prints this help"
 }
 
@@ -142,7 +133,7 @@ check_preconditions() {
 # Check required argument(s)
 if [ -z "${1+x}" ]; then
   print_help
-  run_command notify-send -a $0 "Please provide an input file."
+  echo "Please provide an input file."
   exit 1
 fi
 
@@ -173,15 +164,6 @@ case $key in
     print_debug "Use of GNU Parallel enabled"
     shift
     ;;
-  -t|--temp)
-    if [ -d "$2" ]; then
-      TEMPDIRPREFIX="$2"
-    else
-      echo "Given temporary ($2) is not a directory, using default"
-    fi
-    shift
-    shift
-    ;;
   -s|--speed)
     FFMPEGQUALITYDEC=""
     FFMPEGQUALITYENC="-c:v libx264 -preset ultrafast"
@@ -209,17 +191,10 @@ check_preconditions
 STARTTS=`date +%s`
 
 # Handle temporary directories
-if [ -n "$TEMPDIRPREFIX" ]; then
-  # On some systems not using '-p .' (temp in current dir) might cause problems
-  FRAMESTEMPDIR=`mktemp -d -p $TEMPDIRPREFIX`
-  OUTTEMPDIR=`mktemp -d -p $TEMPDIRPREFIX`
-else
-  FRAMESTEMPDIR=`mktemp -d`
-  OUTTEMPDIR=`mktemp -d`
-fi
+FRAMESTEMPDIR=`mktemp -d`
+OUTTEMPDIR=`mktemp -d`
 
 # Extract frames from video
-run_command notify-send -a $0 "Starting panoramic video stitching..."
 echo "Extracting frames from video (this might take a while)..."
 # Note: anything in quotes will be treated as one single option
 run_command "ffmpeg" "-y" "-i" "$1" $FFMPEGQUALITYDEC "$FRAMESTEMPDIR/$IMAGETMPLDEC"
@@ -248,14 +223,14 @@ print_debug "PTO template: ${PTOTMPL}"
 
 # Stitch frames
 export -f run_command print_debug clean_up
-echo "Stitching frames..."
-if [ -z "${USEPARALLEL+x}" ]; then
-  # No parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -m -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
-else
-  # Use parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS --bar run_command "$DIR/gear360pano.sh" -r -m -o "$OUTTEMPDIR" {} "$PTOTMPL"
-fi
+  echo "Stitching frames..."
+  if [ -z "${USEPARALLEL+x}" ]; then
+    # No parallel
+    find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -m -n -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
+  else
+    # Use parallel
+    find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS run_command "$DIR/gear360pano.sh" -r -m -n -o "$OUTTEMPDIR" {} "$PTOTMPL"
+  fi
 
 # Put stitched frames together
 echo "Recoding the video..."
@@ -283,11 +258,9 @@ print_debug "Input video has audio: ${SRCHASAUDIO}"
 
 if [ -n "$SRCHASAUDIO" ]; then
   echo "Extracting audio..."
-  run_command notify-send -a $0 "Extracting audio from source video..."
   run_command ffmpeg -y -i "$1" -vn -acodec copy "$OUTTEMPDIR/$TMPAUDIO"
 
   echo "Merging audio..."
-  run_command notify-send -a $0 "Merging audio with final video..."
   run_command ffmpeg -y -i "$OUTTEMPDIR/$TMPVIDEO" -i "$OUTTEMPDIR/$TMPAUDIO" -c:v copy -c:a aac -strict experimental "$OUTNAME"
 else
   print_debug "No audio detected (timelapse video?), continuing..."
@@ -301,5 +274,4 @@ clean_up
 ENDTS=`date +%s`
 RUNTIME=$((ENDTS-STARTTS))
 echo Video written to $OUTNAME, took: $RUNTIME s
-run_command notify-send -a $0 "'Conversion complete. Video written to $OUTNAME, took: $RUNTIME s'"
 exit 0

@@ -12,15 +12,12 @@ WHICH=`which $0`
 DIR=$(dirname `readlink -f $WHICH`)
 
 SCRIPTNAME=$0
-GALLERYDIR="html"
-OUTDIR="$DIR/$GALLERYDIR/data"
+OUTDIR="$DIR/html/data"
 OUTTMPNAME="out"
 PTOTMPL_SM_C200="$DIR/gear360sm-c200.pto"
 PTOTMPL_SM_R210="$DIR/gear360sm-r210.pto"
 JPGQUALITY=97
 PTOJPGFILENAME="dummy.jpg"
-# Note, this file is inside GALLERYDIR
-GALLERYFILELIST="filelist.txt"
 # By default we will ignore files that have been processed
 IGNOREPROCESSED="yes"
 # Default blending program
@@ -64,10 +61,6 @@ run_command() {
   local status=$?
   if [ $status -ne 0 ]; then
     echo "Error while running $1" >&2
-    if [ $1 != "notify-send" ]; then
-      # Display error in a nice graphical popup if available
-      run_command notify-send -a $SCRIPTNAME "Error while running $1"
-    fi
     clean_up
     exit 1
   fi
@@ -83,11 +76,7 @@ process_panorama() {
   print_debug "Args: $@"
 
   # Create temporary directory
-  if [ -n "$TEMPDIRPREFIX" ]; then
-    TEMPDIR=`mktemp -d -p $TEMPDIRPREFIX`
-  else
-    TEMPDIR=`mktemp -d`
-  fi
+  TEMPDIR=`mktemp -d`
 
   print_debug "process_panorama: args: in: $1, out: $2, tmpl: $3, tempdir: ${TEMPDIR}"
 
@@ -170,23 +159,11 @@ print_help() {
   echo -e "example: 360_010.JPG -> 360_010_pano.JPG\n"
   echo "-a|--process-all force panorama processing, by default processed"
   echo "             panoaramas are skipped (in output directory)"
-  echo "-g|--gallery update gallery file list"
   echo "-m|--multiblend use multiblend (http://horman.net/multiblend/)"
   echo "             instead of enblend for final stitching"
-  echo "-n|--no-gpu  do not use GPU (safer but slower)"
-  echo "-o|--output  DIR will set the output directory of panoramas"
-  echo "             default: html/data"
   echo "-q|--quality QUALITY will set the JPEG quality to quality"
   echo "-r|--remove  remove source file after processing (use with care)"
-  echo "-t|--temp DIR set temporary directory (default: use system's"
-  echo "             temporary directory)"
   echo "-h|--help    prints this help"
-}
-
-create_gallery() {
-  GALLERYFILELISTFULL="${GALLERYDIR}/${GALLERYFILELIST}"
-  echo "Updating gallery file list in ${GALLERYFILELISTFULL}"
-  ls -l *.mp4 *_pano.jpg > ${GALLERYFILELISTFULL}
 }
 
 # Process arguments. Source (modified):
@@ -198,10 +175,6 @@ key="$1"
 case $key in
   -a|--process-all)
     IGNOREPROCESSED="no"
-    shift
-    ;;
-  -g|--gallery)
-    CREATEGALLERY="yes"
     shift
     ;;
   -h|--help)
@@ -241,15 +214,6 @@ case $key in
     REMOVESOURCE=1
     shift
     ;;
-  -t|--temp)
-    if [ -d "$2" ]; then
-      TEMPDIRPREFIX="$2"
-    else
-      echo "Given temporary ($2) is not a directory, using system default"
-    fi
-    shift
-    shift
-    ;;
   *)
     break
     ;;
@@ -267,11 +231,6 @@ fi
 type nona >/dev/null 2>&1 || { echo >&2 "Hugin required but it is not installed. Aborting."; exit 1; }
 
 STARTTS=`date +%s`
-
-# Warn early about the gallery if the output directory is somewhere else
-if [ "$CREATEGALLERY" == "yes" ] && [ "$OUTDIR" != "html/data" ] && [ "$OUTDIR" != "./html/data" ]; then
-  echo -e "\nGallery file list will be updated but output directory not set to html/data\n"
-fi
 
 # TODO: add option for parallel
 for panofile in $1
@@ -316,17 +275,6 @@ do
     rm $panofile
   fi
 done
-
-if [ "$CREATEGALLERY" == "yes" ]; then
-  # This could be a bit more elegant, but this is the easiest
-  cd $GALLERYDIR
-  COUNT=`cat $GALLERYFILELIST | wc -l`
-  echo "Updating gallery file list, old file count: $COUNT"
-  find data -type f -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.mp4" > $GALLERYFILELIST
-  COUNT=`cat $GALLERYFILELIST | wc -l`
-  echo "New file count: $COUNT"
-  cd ..
-fi
 
 # Inform user about the result
 ENDTS=`date +%s`
