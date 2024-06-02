@@ -224,14 +224,14 @@ print_debug "PTO template: ${PTOTMPL}"
 
 # Stitch frames
 export -f run_command print_debug clean_up
-echo "Stitching frames..."
-if [ -z "${USEPARALLEL+x}" ]; then
-  # No parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -m -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
-else
-  # Use parallel
-  find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS run_command "$DIR/gear360pano.sh" -r -m -o "$OUTTEMPDIR" {} "$PTOTMPL"
-fi
+  echo "Stitching frames..."
+  if [ -z "${USEPARALLEL+x}" ]; then
+    # No parallel
+    find $FRAMESTEMPDIR -type f -name '*.jpg' | xargs -Ipanofile bash -c "run_command \"$DIR/gear360pano.sh\" -r -m -n -o \"$OUTTEMPDIR\" \"panofile\" \"$PTOTMPL\""
+  else
+    # Use parallel
+    find $FRAMESTEMPDIR -type f -name '*.jpg' | parallel $PARALLELEXTRAOPTS run_command "$DIR/gear360pano.sh" -r -m -n -o "$OUTTEMPDIR" {} "$PTOTMPL"
+  fi
 
 # Put stitched frames together
 echo "Recoding the video..."

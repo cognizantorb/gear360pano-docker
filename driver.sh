@@ -10,7 +10,7 @@ args=("$@")
 case "$mode" in
     pano)
         # Execute the gear360pano.sh script for each file in the /in directory, in parallel
-        find /in -iname '*.jpg' -type f | parallel --load 99% --noswap --memfree 500M ./gear360pano.sh "${args[@]}" -o /out {}
+        find /in -iname '*.jpg' -type f | parallel --load 99% --noswap --memfree 500M ./gear360pano.sh "${args[@]}" -n -o /out {}
         ;;
     video)
         # Execute the gear360video.sh script for each .mp4 file in the /in directory
