@@ -103,7 +103,6 @@ print_help() {
   echo "parameter is optional. Video file will be written"
   echo "to a file with appended _pano, ex.: dummy.mp4 will"
   echo -e "be stitched to dummy_pano.mp4.\n"
-  echo "-p|--parallel   use GNU Parallel to speed-up processing"
   echo "-s|--speed      optimise for speed (lower quality)"
   echo "-h|--help       prints this help"
 }

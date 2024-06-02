@@ -16,7 +16,7 @@ case "$mode" in
         # Execute the gear360video.sh script for each .mp4 file in the /in directory
         for file in `find /in -iname "*.mp4" -type f`
         do
-            ./gear360video.sh "${args[@]}" -o /out "$file"
+            ./gear360video.sh "${args[@]}" -p -o /out "$file"
         done
         ;;
     test)
