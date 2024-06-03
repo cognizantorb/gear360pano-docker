@@ -19,6 +19,10 @@ case "$mode" in
             ./gear360video.sh "${args[@]}" -p -o /out "$file"
         done
         ;;
+    concat)
+        # Concatenate all the .mp4 files in the /in directory
+        ffmpeg -f concat -safe 0 -i <(for f in $(find /in -iname "*.mp4" -type f | sort); do echo "file '$f'"; done) -c copy /out/output.mp4
+        ;;
     test)
         ./testgear360pano.sh
         ./testgear360video.sh
